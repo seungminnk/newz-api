@@ -2,26 +2,13 @@ package com.newz.api.vogueNews.service.vogueNews;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import com.newz.api.vogueNews.model.googleVogueNews.GoogleVogueNewsDto;
 import com.newz.api.vogueNews.model.vogueNews.dto.VogueNewsDto;
 import lombok.AllArgsConstructor;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
 
 @Service
 @AllArgsConstructor
