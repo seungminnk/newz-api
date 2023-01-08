@@ -18,8 +18,8 @@ public class NewsController {
   @GetMapping("/list")
   public ResponseEntity<List<Map<String, Object>>> getNewsListByQuery(
       @RequestParam("query") String query,
-      @RequestParam(value = "page", required = false) int page,
-      @RequestParam(value = "limit", required = false) int limit) {
+      @RequestParam(value = "page", required = false, defaultValue = "1") int page,
+      @RequestParam(value = "limit", required = false, defaultValue = "3") int limit) {
     List<Map<String, Object>> result = new ArrayList<>();
 
     Map<String, Object> item1 = new HashMap<>();
