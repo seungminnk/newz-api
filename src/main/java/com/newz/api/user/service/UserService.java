@@ -16,6 +16,10 @@ public class UserService {
   public Map<String, Object> getUserInformationByUserId(int userId) {
     UserVo user = userRepository.getUserInformationByUserId(userId);
 
+    if(user == null) {
+      return new HashMap<>();
+    }
+
     Map<String, Object> result = new HashMap<>();
     result.put("id", user.getId());
     result.put("name", user.getName());
