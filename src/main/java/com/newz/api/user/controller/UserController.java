@@ -30,7 +30,7 @@ public class UserController {
     result.put("id", id);
     result.put("name", "뉴모아");
 
-    return new ResponseEntity<>(userService.getUserInformationByUserId(id), HttpStatus.OK);
+    return new ResponseEntity<>(result, HttpStatus.OK);
   }
 
   @GetMapping("/keyword/list")
