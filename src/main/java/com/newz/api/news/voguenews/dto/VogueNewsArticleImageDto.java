@@ -1,4 +1,4 @@
-package com.newz.api.vogueNews.model.vogueNews.dto;
+package com.newz.api.news.voguenews.dto;
 
 import com.google.gson.JsonObject;
 import lombok.Getter;

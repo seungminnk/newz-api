@@ -1,4 +1,4 @@
-package com.newz.api.news.controller;
+package com.newz.api.news.keywordnews.controller;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/news")
-public class NewsController {
+@RequestMapping("/api/news")
+public class KeywordNewsController {
 
   @GetMapping("/list")
   public ResponseEntity<List<Map<String, Object>>> getNewsListByQuery(
