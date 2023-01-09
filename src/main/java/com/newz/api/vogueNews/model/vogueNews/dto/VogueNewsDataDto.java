@@ -1,11 +1,10 @@
 package com.newz.api.vogueNews.model.vogueNews.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,19 +12,14 @@ import java.util.List;
 @Getter
 public class VogueNewsDataDto implements Comparable<VogueNewsDataDto> {
     Integer rank;
-    String title;
-    String summary = null;
-    String source;
-    String imageUrl = null;
-    String newsUrl = null;
+    String keyword;
+    @JsonProperty("articles")
+    List<VogueNewsArticleDto> vogueNewsArticleDtoList;
 
-    public VogueNewsDataDto(Integer rank, String title, String summary,String source, String imageUrl, String newsUrl) {
+    public VogueNewsDataDto(Integer rank, String keyword, List<VogueNewsArticleDto> vogueNewsArticleDtoList) {
         this.rank = rank;
-        this.title = title;
-        this.summary = summary;
-        this.source = source;
-        this.imageUrl = imageUrl;
-        this.newsUrl = newsUrl;
+        this.keyword = keyword;
+        this.vogueNewsArticleDtoList = vogueNewsArticleDtoList;
     }
 
     public static List<VogueNewsDataDto> fromJsonObject(JsonObject googleTrendsJsonObject){
@@ -37,21 +31,14 @@ public class VogueNewsDataDto implements Comparable<VogueNewsDataDto> {
             JsonElement googleSearchTrend = googleSearchTrends.get(index);
             JsonArray googleSearchTrendArticleArray = googleSearchTrend.getAsJsonObject().get("articles").getAsJsonArray();
 
-            String imageYN = googleSearchTrendArticleArray.get(0).getAsJsonObject().get("image") == null ? "N":"Y";
-            String imageUrl = "";
-
-            if(imageYN.equals("Y")){
-                imageUrl = String.valueOf(googleSearchTrendArticleArray.get(0).getAsJsonObject().get("image").getAsJsonObject().get("imageUrl"));
-            }
+            int rank = index + 1;
+            String keyword = String.valueOf(googleSearchTrend.getAsJsonObject().get("title").getAsJsonObject().get("query"));
 
             vogueNewsDataDtoList.add(
                 new VogueNewsDataDto(
-                    index + 1,
-                    String.valueOf(googleSearchTrend.getAsJsonObject().get("title").getAsJsonObject().get("query")),
-                    String.valueOf(googleSearchTrendArticleArray.get(0).getAsJsonObject().get("snippet")),
-                    String.valueOf(googleSearchTrendArticleArray.get(0).getAsJsonObject().get("source")),
-                    imageUrl,
-                    String.valueOf(googleSearchTrendArticleArray.get(0).getAsJsonObject().get("url"))
+                    rank,
+                    keyword,
+                    VogueNewsArticleDto.fromArticleJsonObject(googleSearchTrendArticleArray)
                 )
             );
         }

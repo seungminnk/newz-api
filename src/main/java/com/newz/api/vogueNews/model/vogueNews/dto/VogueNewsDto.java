@@ -1,5 +1,6 @@
 package com.newz.api.vogueNews.model.vogueNews.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.gson.JsonObject;
 import lombok.Getter;
 
@@ -9,12 +10,14 @@ import java.util.List;
 public class VogueNewsDto {
     String domain;
     String date;
-    List<VogueNewsDataDto> data;
 
-    public VogueNewsDto(String domain, String date, List<VogueNewsDataDto> data) {
+    @JsonProperty("vogueNews")
+    List<VogueNewsDataDto> vogueNewsDataDtoList;
+
+    public VogueNewsDto(String domain, String date, List<VogueNewsDataDto> vogueNewsDataDtoList) {
         this.domain = domain;
         this.date = date;
-        this.data = data;
+        this.vogueNewsDataDtoList = vogueNewsDataDtoList;
     }
 
     public static VogueNewsDto fromJsonObject(String domain, JsonObject googleTrendsJsonObject){
@@ -30,7 +33,7 @@ public class VogueNewsDto {
 
     VogueNewsDto sortedDataByRank(){
 
-        this.data = this.data.stream().sorted().toList();
+        this.vogueNewsDataDtoList = this.vogueNewsDataDtoList.stream().sorted().toList();
 
         return this;
     }
