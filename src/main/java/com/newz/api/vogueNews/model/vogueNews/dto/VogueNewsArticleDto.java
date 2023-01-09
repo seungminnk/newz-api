@@ -1,5 +1,6 @@
 package com.newz.api.vogueNews.model.vogueNews.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -14,12 +15,13 @@ public class VogueNewsArticleDto {
      * image, snippet, source, timeAgo, title, url
      * */
 
-    VogueNewsArticleImageDto vogueNewsArticleImageDto = null;
     String summary;
     String source;
     String timeAgo;
     String title;
     String newsUrl;
+    @JsonProperty("imageObj")
+    VogueNewsArticleImageDto vogueNewsArticleImageDto = null;
 
     public VogueNewsArticleDto(String summary, String source, String timeAgo, String title, String newsUrl) {
         this.summary = summary;
@@ -30,12 +32,12 @@ public class VogueNewsArticleDto {
     }
 
     public VogueNewsArticleDto(VogueNewsArticleImageDto vogueNewsArticleImageDto, String summary, String source, String timeAgo, String title, String newsUrl) {
-        this.vogueNewsArticleImageDto = vogueNewsArticleImageDto;
         this.summary = summary;
         this.source = source;
         this.timeAgo = timeAgo;
         this.title = title;
         this.newsUrl = newsUrl;
+        this.vogueNewsArticleImageDto = vogueNewsArticleImageDto;
     }
 
     public static List<VogueNewsArticleDto> fromArticleJsonObject(JsonArray articleJsonArray){
