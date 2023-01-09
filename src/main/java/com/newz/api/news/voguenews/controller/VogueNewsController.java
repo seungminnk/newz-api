@@ -1,7 +1,7 @@
-package com.newz.api.vogueNews.controller;
+package com.newz.api.news.voguenews.controller;
 
-import com.newz.api.vogueNews.model.vogueNews.dto.VogueNewsDto;
-import com.newz.api.vogueNews.service.vogueNews.VogueNewsService;
+import com.newz.api.news.voguenews.dto.VogueNewsDto;
+import com.newz.api.news.voguenews.service.VogueNewsService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;

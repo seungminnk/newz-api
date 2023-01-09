@@ -1,8 +1,8 @@
-package com.newz.api.vogueNews.service.vogueNews;
+package com.newz.api.news.voguenews.service;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import com.newz.api.vogueNews.model.vogueNews.dto.VogueNewsDto;
+import com.newz.api.news.voguenews.dto.VogueNewsDto;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
