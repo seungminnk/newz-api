@@ -1,11 +1,13 @@
 package com.newz.api.user.controller;
 
 import com.newz.api.user.model.BookmarkAddRequest;
+import com.newz.api.user.model.UserKeywordSetRequest;
 import com.newz.api.user.service.UserService;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -45,7 +47,9 @@ public class UserController {
   }
 
   @PostMapping("/keyword")
-  public ResponseEntity<List<Map<String, Object>>> setUserKeyword(@RequestBody List<String> keywords) {
+  public ResponseEntity<List<Map<String, Object>>> setUserKeyword(@RequestBody @Valid UserKeywordSetRequest request)
+      throws Exception {
+    userService.setUserKeyword(request);
     return new ResponseEntity<>(HttpStatus.OK);
   }
 
