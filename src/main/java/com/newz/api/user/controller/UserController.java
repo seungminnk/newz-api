@@ -31,6 +31,9 @@ public class UserController {
     Map<String, Object> result = new HashMap<>();
     result.put("id", id);
     result.put("name", "뉴모아");
+    result.put("email", "newmoa@email.com");
+    result.put("loginType", "구글");
+    result.put("completeOnboarding", false);
 
     return new ResponseEntity<>(result, HttpStatus.OK);
   }
