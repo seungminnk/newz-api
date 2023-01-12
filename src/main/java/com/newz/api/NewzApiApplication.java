@@ -17,7 +17,8 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 			description = "Newz api 서버 문서입니다."
 	),
 	servers = {
-		@Server(url = "localhost:3001", description = "로컬 서버"),
+		@Server(url = "http://localhost:3001", description = "로컬 서버"),
+		@Server(url = "http://localhost:8080", description = "로컬 서버"),
 		@Server(url = "https://newz.bbear.kr", description = "메인 서버"),
 	}
 )
