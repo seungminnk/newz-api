@@ -22,7 +22,7 @@ public class VogueNewsController {
 
     VogueNewsService vogueNewsService;
 
-    @GetMapping("/keywords")
+    @GetMapping("/keyword")
     List<VogueNewsOnlyKeyword> getOnlyKeywords(){
         return vogueNewsService.retrieveOnlyKeywordsFromGoogleTrendApi();
     }
