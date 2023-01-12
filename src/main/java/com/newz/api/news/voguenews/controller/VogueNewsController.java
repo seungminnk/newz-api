@@ -1,6 +1,7 @@
 package com.newz.api.news.voguenews.controller;
 
 import com.newz.api.news.voguenews.dto.VogueNewsDto;
+import com.newz.api.news.voguenews.dto.VogueNewsOnlyKeyword;
 import com.newz.api.news.voguenews.service.VogueNewsService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -12,12 +13,19 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @AllArgsConstructor
 @RequestMapping("/api/news/vogue")
 public class VogueNewsController {
 
     VogueNewsService vogueNewsService;
+
+    @GetMapping("/keywords")
+    List<VogueNewsOnlyKeyword> getOnlyKeywords(){
+        return vogueNewsService.retrieveOnlyKeywordsFromGoogleTrendApi();
+    }
 
     @Operation(summary = "인기 검색어와 해당 검색어에 따르는 기사들 데이터 반환")
     @ApiResponses(value = {
