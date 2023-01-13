@@ -1,17 +1,15 @@
-package com.newz.api.user.vo;
+package com.newz.api.user.model;
 
+import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 
 @Getter
-@Setter
-public class UserVo {
+@Builder
+public class UserInformationResponse {
 
   private int id;
-  private String clientId;
   private String name;
   private String email;
-
   private boolean haveKeywords;
 
 }

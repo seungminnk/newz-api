@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.newz.api.keyword.repository.KeywordRepository">
+  <select id="getFixedKeywords" resultType="String">
+    SELECT keyword
+    FROM fixed_keyword
+    ORDER BY RAND()
+    LIMIT 9
+  </select>
+</mapper>

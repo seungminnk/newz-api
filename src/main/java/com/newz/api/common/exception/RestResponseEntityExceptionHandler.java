@@ -11,6 +11,7 @@ public class RestResponseEntityExceptionHandler {
   @ExceptionHandler(value = {Exception.class})
   protected ResponseEntity<ErrorResponse> handleException(Exception e) {
     ErrorResponse response = ErrorResponse.builder()
+        .code("INTERNAL_SERVER_ERROR")
         .message(e.getMessage())
         .build();
 
@@ -20,6 +21,7 @@ public class RestResponseEntityExceptionHandler {
   @ExceptionHandler(value = {NewzCommonException.class})
   protected ResponseEntity<ErrorResponse> handleNewzCommonException(NewzCommonException e) {
     ErrorResponse response = ErrorResponse.builder()
+        .code(e.getCode())
         .message(e.getMessage())
         .build();
 

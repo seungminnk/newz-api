@@ -1,17 +1,31 @@
 package com.newz.api.user.service;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import com.newz.api.common.exception.ErrorCode;
 import com.newz.api.common.exception.NewzCommonException;
+import com.newz.api.user.model.BookmarkAddRequest;
+import com.newz.api.user.model.BookmarkNewsListModel;
+import com.newz.api.user.model.BookmarkNewsListResponse;
+import com.newz.api.user.model.UserInformationResponse;
 import com.newz.api.user.model.UserKeywordSetRequest;
 import com.newz.api.user.repository.UserRepository;
+import com.newz.api.user.vo.UserBookmarkVo;
 import com.newz.api.user.vo.UserKeywordVo;
 import com.newz.api.user.vo.UserVo;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 @Service
 @AllArgsConstructor
@@ -19,19 +33,28 @@ public class UserService {
 
   private UserRepository userRepository;
 
-  public Map<String, Object> getUserInformationByUserId(int userId) {
+  private final Gson gson = new Gson();
+  private final RestTemplate restTemplate = new RestTemplate();
+
+  private static final String NEWS_API_URL = "http://localhost:5000/news/data";
+
+  public UserInformationResponse getUserInformationByUserId(int userId) {
     UserVo user = userRepository.getUserInformationByUserId(userId);
 
-    if(user == null) {
-      return new HashMap<>();
+    if(user == null || StringUtils.isBlank(user.getName())) {
+      throw new NewzCommonException(HttpStatus.NOT_FOUND, ErrorCode.USER_NOT_FOUND);
     }
 
-    Map<String, Object> result = new HashMap<>();
-    result.put("id", user.getId());
-    result.put("name", user.getName());
-    result.put("email", user.getEmail());
+    return UserInformationResponse.builder()
+        .id(user.getId())
+        .name(user.getName())
+        .email(user.getEmail())
+        .haveKeywords(user.isHaveKeywords())
+        .build();
+  }
 
-    return result;
+  public List<String> getUserKeywordsByUserId(int userId) {
+    return userRepository.getUserKeywordsByUserId(userId);
   }
 
   public void setUserKeyword(UserKeywordSetRequest request) throws Exception {
@@ -39,6 +62,7 @@ public class UserService {
     if(savedKeywordTotalCount == 9 || savedKeywordTotalCount + request.getKeywords().size() > 9) {
       throw new NewzCommonException(
           HttpStatus.CONFLICT,
+          ErrorCode.ONLY_CAN_SAVE_UP_TO_NINE_KEYWORD.getCode(),
           "키워드는 총 9개까지 저장 가능합니다. "
               + "현재 저장된 키워드는 " + savedKeywordTotalCount+ "개, "
               + "저장하려는 키워드는 " + request.getKeywords().size() + "개 입니다.");
@@ -52,6 +76,79 @@ public class UserService {
         .collect(Collectors.toList());
 
     userRepository.insertUserKeywords(keywords);
+  }
+
+  public BookmarkNewsListResponse getUserBookmarkNewsByUserId(int userId, int page, int limit) {
+    if(page < 1) {
+      page = 1;
+    }
+
+    int totalBookmarkCount = userRepository.getUSerBookmarkTotalCountByUserId(userId);
+    if(totalBookmarkCount == 0) {
+      return BookmarkNewsListResponse.builder()
+          .total(totalBookmarkCount)
+          .page(page)
+          .news(Collections.emptyList())
+          .build();
+    }
+
+    int offset = page != 0 ? (page-1) * limit : 0;
+    List<UserBookmarkVo> savedBookmarkNews = userRepository.getUserBookmarkNewsByUserId(userId, offset, limit);
+
+    if(savedBookmarkNews.isEmpty()) {
+      return BookmarkNewsListResponse.builder()
+          .total(totalBookmarkCount)
+          .page(page)
+          .news(Collections.emptyList())
+          .build();
+    }
+
+    List<BookmarkNewsListModel> bookmarkNewsList = new ArrayList<>();
+    List<String> bookmarkNewsUrls = new ArrayList<>();
+    for(UserBookmarkVo bookmark : savedBookmarkNews) {
+      BookmarkNewsListModel bookmarkRes = BookmarkNewsListModel.builder()
+          .bookmarkId(bookmark.getId())
+          .link(bookmark.getNewsUrl())
+          .build();
+
+      bookmarkNewsUrls.add(bookmark.getNewsUrl());
+      bookmarkNewsList.add(bookmarkRes);
+    }
+
+    HttpHeaders headers = new HttpHeaders();
+    headers.setContentType(MediaType.APPLICATION_JSON);
+
+    Map<String, Object> fields = new HashMap<>();
+    fields.put("newsUrls", bookmarkNewsUrls);
+
+    String response = restTemplate.postForObject(NEWS_API_URL, fields, String.class);
+    Map<String, Object> parsedData = gson.fromJson(response, new TypeToken<Map<String, Object>>(){}.getType());
+
+    List<Map<String, Object>> newsData = (List<Map<String, Object>>) parsedData.get("news");
+
+    for(int idx = 0; idx < bookmarkNewsList.size(); idx++) {
+      bookmarkNewsList.get(idx).setTitle(newsData.get(idx).get("title").toString());
+      bookmarkNewsList.get(idx).setContent(newsData.get(idx).get("content").toString());
+    }
+
+    return BookmarkNewsListResponse.builder()
+        .total(totalBookmarkCount)
+        .page(page)
+        .news(bookmarkNewsList)
+        .build();
+  }
+
+  public void addUserBookmark(BookmarkAddRequest request) {
+    UserBookmarkVo bookmark = UserBookmarkVo.builder()
+        .userId(request.getUserId())
+        .newsUrl(request.getNewsUrl())
+        .build();
+
+    userRepository.insertUserBookmark(bookmark);
+  }
+
+  public void removeUserBookmark(int bookmarkId) {
+    userRepository.deleteUserBookmarkByBookmarkId(bookmarkId);
   }
 
 }

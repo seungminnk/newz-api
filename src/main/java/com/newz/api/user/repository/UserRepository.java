@@ -1,5 +1,6 @@
 package com.newz.api.user.repository;
 
+import com.newz.api.user.vo.UserBookmarkVo;
 import com.newz.api.user.vo.UserKeywordVo;
 import com.newz.api.user.vo.UserVo;
 import java.util.List;
@@ -10,8 +11,18 @@ public interface UserRepository {
 
   UserVo getUserInformationByUserId(int userId);
 
+  List<String> getUserKeywordsByUserId(int userId);
+
   int getSavedKeywordTotalCountByUserId(int userId);
 
   int insertUserKeywords(List<UserKeywordVo> keywords);
+
+  int getUSerBookmarkTotalCountByUserId(int userId);
+
+  List<UserBookmarkVo> getUserBookmarkNewsByUserId(int userId, int offset, int limit);
+
+  int insertUserBookmark(UserBookmarkVo bookmark);
+
+  int deleteUserBookmarkByBookmarkId(int bookmarkId);
 
 }

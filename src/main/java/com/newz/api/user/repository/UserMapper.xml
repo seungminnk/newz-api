@@ -4,9 +4,16 @@
 
 <mapper namespace="com.newz.api.user.repository.UserRepository">
   <select id="getUserInformationByUserId" resultType="com.newz.api.user.vo.UserVo">
-    SELECT id, name, email
-    FROM user
-    WHERE id = #{userId}
+    SELECT u.id, u.name, u.email, IF(count(uk.keyword), true, false) AS haveKeywords
+    FROM user u
+      LEFT JOIN user_keyword uk ON u.id = uk.user_id
+    WHERE u.id = #{userId}
+  </select>
+
+  <select id="getUserKeywordsByUserId" resultType="String">
+    SELECT keyword
+    FROM user_keyword
+    WHERE user_id = #{userId}
   </select>
 
   <select id="getSavedKeywordTotalCountByUserId" resultType="int">
@@ -22,4 +29,27 @@
       #{keyword.userId}, #{keyword.keyword}
     </foreach>
   </insert>
+
+  <select id="getUSerBookmarkTotalCountByUserId" resultType="int">
+    SELECT count(*)
+    FROM user_bookmark
+    WHERE user_id = #{userId}
+  </select>
+
+  <select id="getUserBookmarkNewsByUserId" resultType="com.newz.api.user.vo.UserBookmarkVo">
+    SELECT id, news_url
+    FROM user_bookmark
+    WHERE user_id = #{userId}
+    LIMIT #{offset}, #{limit}
+  </select>
+
+  <insert id="insertUserBookmark" parameterType="com.newz.api.user.vo.UserBookmarkVo">
+    INSERT IGNORE INTO user_bookmark(user_id, news_url)
+    VALUE (#{userId}, #{newsUrl})
+  </insert>
+
+  <delete id="deleteUserBookmarkByBookmarkId" parameterType="int">
+    DELETE FROM user_bookmark
+    WHERE id = #{bookmarkId}
+  </delete>
 </mapper>

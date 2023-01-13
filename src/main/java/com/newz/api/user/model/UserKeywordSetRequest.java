@@ -10,10 +10,10 @@ import lombok.Setter;
 @Setter
 public class UserKeywordSetRequest {
 
-  @Min(value = 0, message = "'userId' 파라미터는 필수입니다.")
+  @Min(value = 1, message = "'userId' 필드는 필수입니다.")
   private int userId;
 
-  @NotEmpty(message = "'keywords' 파라미터는 필수입니다.")
+  @NotEmpty(message = "'keywords' 필드는 필수입니다.")
   private List<String> keywords;
 
 }

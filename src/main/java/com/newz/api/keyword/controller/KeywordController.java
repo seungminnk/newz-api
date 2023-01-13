@@ -1,5 +1,6 @@
 package com.newz.api.keyword.controller;
 
+import com.newz.api.keyword.service.KeywordService;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -15,15 +16,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api")
 public class KeywordController {
 
+  private KeywordService keywordService;
+
   @GetMapping("/fixed-keyword/list")
   public ResponseEntity<List<String>> getFixedKeywordList() {
-    List<String> result = new ArrayList<>();
-    result.add("구글");
-    result.add("오늘의 날씨");
-    result.add("축구");
-    result.add("테슬라");
-
-    return new ResponseEntity<>(result, HttpStatus.OK);
+    return new ResponseEntity<>(keywordService.getFixedKeywords(), HttpStatus.OK);
   }
 
 }
