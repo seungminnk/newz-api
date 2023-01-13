@@ -43,7 +43,7 @@ public class UserController {
           content = {
               @Content(
                   mediaType = "application/json",
-                  schema = @Schema(implementation = NewsListResponse.class)
+                  schema = @Schema(implementation = UserInformationResponse.class)
               )
           }
       ),
@@ -85,11 +85,23 @@ public class UserController {
   @ApiResponses(value = {
       @ApiResponse(
           responseCode = "200",
-          description = "원하는 키워드를 등록(키워드 여러개 한꺼번에 등록 가능하지만, 총 9개까지 등록 가능.)"
+          description = "원하는 키워드를 등록(키워드 여러개 한꺼번에 등록 가능하지만, 총 9개까지 등록 가능.)",
+          content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema()
+              )
+          }
       ),
       @ApiResponse(
           responseCode = "409",
-          description = "등록하려는 키워드 개수와 등록된 키워드 개수를 합해 9개를 초과한 경우 409(Conflict) 반환"
+          description = "등록하려는 키워드 개수와 등록된 키워드 개수를 합해 9개를 초과한 경우 409(Conflict) 반환",
+          content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema()
+              )
+          }
       )
   })
   @PostMapping("/keyword")
@@ -124,7 +136,13 @@ public class UserController {
   @ApiResponses(value = {
       @ApiResponse(
           responseCode = "201",
-          description = "북마크 추가에 성공하면 201(Created) 반환"
+          description = "북마크 추가에 성공하면 201(Created) 반환",
+          content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema()
+              )
+          }
       )
   })
   @PostMapping("/bookmark/add")
@@ -137,7 +155,13 @@ public class UserController {
   @ApiResponses(value = {
       @ApiResponse(
           responseCode = "200",
-          description = "북마크 제거에 성공하면 200(OK) 반환"
+          description = "북마크 제거에 성공하면 200(OK) 반환",
+          content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema()
+              )
+          }
       )
   })
   @PatchMapping("/bookmark/remove")

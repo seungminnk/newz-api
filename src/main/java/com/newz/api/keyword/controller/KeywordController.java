@@ -31,7 +31,7 @@ public class KeywordController {
           content = {
               @Content(
                   mediaType = "application/json",
-                  schema = @Schema(implementation = ArrayList.class)
+                  schema = @Schema(implementation = List.class)
               )
           }
       )
