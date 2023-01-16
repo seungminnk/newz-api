@@ -17,6 +17,8 @@ public interface UserRepository {
 
   int insertUserKeywords(List<UserKeywordVo> keywords);
 
+  int deleteUserKeywords(int userId, List<String> keywords);
+
   int getUSerBookmarkTotalCountByUserId(int userId);
 
   List<UserBookmarkVo> getUserBookmarkNewsByUserId(int userId, int offset, int limit);

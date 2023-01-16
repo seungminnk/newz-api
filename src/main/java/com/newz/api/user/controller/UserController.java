@@ -5,6 +5,7 @@ import com.newz.api.news.keywordnews.model.NewsListResponse;
 import com.newz.api.user.model.BookmarkAddRequest;
 import com.newz.api.user.model.BookmarkNewsListResponse;
 import com.newz.api.user.model.UserInformationResponse;
+import com.newz.api.user.model.UserKeywordRemoveRequest;
 import com.newz.api.user.model.UserKeywordSetRequest;
 import com.newz.api.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -20,6 +21,7 @@ import javax.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -81,7 +83,7 @@ public class UserController {
     return new ResponseEntity<>(userService.getUserKeywordsByUserId(userId), HttpStatus.OK);
   }
 
-  @Operation(summary = "키워드 등록하기")
+  @Operation(summary = "사용자 키워드 등록하기")
   @ApiResponses(value = {
       @ApiResponse(
           responseCode = "200",
@@ -105,9 +107,28 @@ public class UserController {
       )
   })
   @PostMapping("/keyword")
-  public ResponseEntity<List<Map<String, Object>>> setUserKeyword(@RequestBody @Valid UserKeywordSetRequest request)
+  public ResponseEntity setUserKeyword(@RequestBody @Valid UserKeywordSetRequest request)
       throws Exception {
     userService.setUserKeyword(request);
+    return new ResponseEntity<>(HttpStatus.OK);
+  }
+
+  @Operation(summary = "사용자 키워드 제거하기")
+  @ApiResponses(value = {
+      @ApiResponse(
+          responseCode = "200",
+          description = "등록했던 키워드를 삭제",
+          content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema()
+              )
+          }
+      )
+  })
+  @DeleteMapping("/keyword")
+  public ResponseEntity removeUserKeyword(@RequestBody @Valid UserKeywordRemoveRequest request) {
+    userService.removeUserKeyword(request);
     return new ResponseEntity<>(HttpStatus.OK);
   }
 

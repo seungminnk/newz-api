@@ -30,6 +30,15 @@
     </foreach>
   </insert>
 
+  <delete id="deleteUserKeywords" parameterType="com.newz.api.user.vo.UserKeywordVo">
+    DELETE FROM user_keyword
+    WHERE user_id = #{userId}
+      AND keyword IN
+    <foreach collection="keywords" item="keyword" open="(" close=")" separator=", ">
+        #{keyword}
+    </foreach>
+  </delete>
+
   <select id="getUSerBookmarkTotalCountByUserId" resultType="int">
     SELECT count(*)
     FROM user_bookmark

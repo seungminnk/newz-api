@@ -8,6 +8,7 @@ import com.newz.api.user.model.BookmarkAddRequest;
 import com.newz.api.user.model.BookmarkNewsListModel;
 import com.newz.api.user.model.BookmarkNewsListResponse;
 import com.newz.api.user.model.UserInformationResponse;
+import com.newz.api.user.model.UserKeywordRemoveRequest;
 import com.newz.api.user.model.UserKeywordSetRequest;
 import com.newz.api.user.repository.UserRepository;
 import com.newz.api.user.vo.UserBookmarkVo;
@@ -76,6 +77,14 @@ public class UserService {
         .collect(Collectors.toList());
 
     userRepository.insertUserKeywords(keywords);
+  }
+
+  public void removeUserKeyword(UserKeywordRemoveRequest request) {
+    if(request.getKeywords().isEmpty()) {
+      return;
+    }
+
+    userRepository.deleteUserKeywords(request.getUserId(), request.getKeywords());
   }
 
   public BookmarkNewsListResponse getUserBookmarkNewsByUserId(int userId, int page, int limit) {
