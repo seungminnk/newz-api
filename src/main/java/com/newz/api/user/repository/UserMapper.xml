@@ -16,6 +16,12 @@
     WHERE user_id = #{userId}
   </select>
 
+  <insert id="saveRefreshToken">
+    UPDATE user
+    SET refresh_token = #{refreshToken}
+    WHERE id = #{userId}
+  </insert>
+
   <insert id="insertUser" useGeneratedKeys="true" keyProperty="id" parameterType="com.newz.api.user.vo.UserVo">
     INSERT INTO user(social_service_type, social_service_unique_id, name, email)
     VALUE (#{socialServiceType}, #{socialServiceUniqueId}, #{name}, #{email})

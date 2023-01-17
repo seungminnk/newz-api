@@ -13,6 +13,8 @@ public interface UserRepository {
 
   int getUserKeywordTotalCountByUserId(int userId);
 
+  int saveRefreshToken(int userId, String refreshToken);
+
   int insertUser(UserVo user);
 
   UserVo getUserInformationByUserId(int userId);

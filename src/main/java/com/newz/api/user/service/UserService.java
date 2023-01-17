@@ -2,13 +2,13 @@ package com.newz.api.user.service;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.newz.api.common.auth.JwtUtil;
 import com.newz.api.common.exception.ErrorCode;
 import com.newz.api.common.exception.NewzCommonException;
 import com.newz.api.user.model.BookmarkAddRequest;
 import com.newz.api.user.model.BookmarkNewsListModel;
 import com.newz.api.user.model.BookmarkNewsListResponse;
 import com.newz.api.user.model.LoginRequest;
-import com.newz.api.user.model.SocialServiceType;
 import com.newz.api.user.model.UserInformationResponse;
 import com.newz.api.user.model.UserKeywordRemoveRequest;
 import com.newz.api.user.model.UserKeywordSetRequest;
@@ -52,11 +52,18 @@ public class UserService {
     if(user != null) {
       int keywordTotalCount = userRepository.getUserKeywordTotalCountByUserId(user.getId());
 
+      String accessToken = JwtUtil.generateAccessToken(user.getId());
+      String refreshToken = JwtUtil.generateRefreshToken();
+
+      userRepository.saveRefreshToken(user.getId(), refreshToken);
+
       return UserInformationResponse.builder()
           .id(user.getId())
           .name(user.getName())
           .email(user.getEmail())
           .haveKeywords(keywordTotalCount > 0)
+          .accessToken(accessToken)
+          .refreshToken(refreshToken)
           .build();
     }
 
@@ -69,11 +76,18 @@ public class UserService {
 
     userRepository.insertUser(newUser);
 
+    String accessToken = JwtUtil.generateAccessToken(newUser.getId());
+    String refreshToken = JwtUtil.generateRefreshToken();
+
+    userRepository.saveRefreshToken(newUser.getId(), refreshToken);
+
     return UserInformationResponse.builder()
         .id(newUser.getId())
         .name(newUser.getName())
         .email(newUser.getEmail())
         .haveKeywords(false)
+        .accessToken(accessToken)
+        .refreshToken(refreshToken)
         .build();
   }
 
