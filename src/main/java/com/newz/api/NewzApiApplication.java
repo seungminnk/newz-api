@@ -18,7 +18,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 	),
 	servers = {
 		@Server(url = "http://localhost:3001", description = "로컬 서버"),
-		@Server(url = "http://localhost:8080", description = "로컬 서버"),
+		@Server(url = "http://localhost:8081", description = "로컬 서버"),
 		@Server(url = "https://newz.bbear.kr", description = "메인 서버"),
 	}
 )
@@ -35,7 +35,7 @@ public class NewzApiApplication {
 		return new WebMvcConfigurer() {
 			@Override
 			public void addCorsMappings(CorsRegistry registry) {
-				registry.addMapping("/api/**").allowedOrigins("*");
+				registry.addMapping("/api/**").allowedOrigins("*").allowedMethods("*");
 			}
 		};
 	}
