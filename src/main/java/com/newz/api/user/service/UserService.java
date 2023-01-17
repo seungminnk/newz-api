@@ -7,6 +7,8 @@ import com.newz.api.common.exception.NewzCommonException;
 import com.newz.api.user.model.BookmarkAddRequest;
 import com.newz.api.user.model.BookmarkNewsListModel;
 import com.newz.api.user.model.BookmarkNewsListResponse;
+import com.newz.api.user.model.LoginRequest;
+import com.newz.api.user.model.SocialServiceType;
 import com.newz.api.user.model.UserInformationResponse;
 import com.newz.api.user.model.UserKeywordRemoveRequest;
 import com.newz.api.user.model.UserKeywordSetRequest;
@@ -26,6 +28,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 @Service
@@ -38,6 +41,41 @@ public class UserService {
   private final RestTemplate restTemplate = new RestTemplate();
 
   private static final String NEWS_API_URL = "http://localhost:5000/news/data";
+
+  @Transactional
+  public UserInformationResponse login(LoginRequest request) {
+    // TODO: 소셜로그인 유효성 체크
+
+    UserVo user = userRepository.getUserInformationByServiceUniqueId(
+        request.getServiceType().getServiceType(), request.getServiceUniqueId());
+
+    if(user != null) {
+      int keywordTotalCount = userRepository.getUserKeywordTotalCountByUserId(user.getId());
+
+      return UserInformationResponse.builder()
+          .id(user.getId())
+          .name(user.getName())
+          .email(user.getEmail())
+          .haveKeywords(keywordTotalCount > 0)
+          .build();
+    }
+
+    UserVo newUser = UserVo.builder()
+        .socialServiceType(request.getServiceType().getServiceType())
+        .socialServiceUniqueId(request.getServiceUniqueId())
+        .name("뉴모아")
+        .email("newmoa.newz@gmail.com")
+        .build();
+
+    userRepository.insertUser(newUser);
+
+    return UserInformationResponse.builder()
+        .id(newUser.getId())
+        .name(newUser.getName())
+        .email(newUser.getEmail())
+        .haveKeywords(false)
+        .build();
+  }
 
   public UserInformationResponse getUserInformationByUserId(int userId) {
     UserVo user = userRepository.getUserInformationByUserId(userId);

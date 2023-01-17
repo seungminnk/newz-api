@@ -12,4 +12,7 @@ public class UserInformationResponse {
   private String email;
   private boolean haveKeywords;
 
+  private String accessToken;
+  private String refreshToken;
+
 }

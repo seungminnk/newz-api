@@ -3,6 +3,24 @@
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.newz.api.user.repository.UserRepository">
+  <select id="getUserInformationByServiceUniqueId" resultType="com.newz.api.user.vo.UserVo">
+    SELECT id, name, email
+    FROM user
+    WHERE social_service_type = #{serviceType}
+      AND social_service_unique_id = #{serviceUniqueId}
+  </select>
+
+  <select id="getUserKeywordTotalCountByUserId" resultType="int">
+    SELECT count(*)
+    FROM user_keyword
+    WHERE user_id = #{userId}
+  </select>
+
+  <insert id="insertUser" useGeneratedKeys="true" keyProperty="id" parameterType="com.newz.api.user.vo.UserVo">
+    INSERT INTO user(social_service_type, social_service_unique_id, name, email)
+    VALUE (#{socialServiceType}, #{socialServiceUniqueId}, #{name}, #{email})
+  </insert>
+
   <select id="getUserInformationByUserId" resultType="com.newz.api.user.vo.UserVo">
     SELECT u.id, u.name, u.email, IF(count(uk.keyword), true, false) AS haveKeywords
     FROM user u

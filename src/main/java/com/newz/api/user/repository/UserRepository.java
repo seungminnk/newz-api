@@ -9,6 +9,12 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface UserRepository {
 
+  UserVo getUserInformationByServiceUniqueId(String serviceType, String serviceUniqueId);
+
+  int getUserKeywordTotalCountByUserId(int userId);
+
+  int insertUser(UserVo user);
+
   UserVo getUserInformationByUserId(int userId);
 
   List<String> getUserKeywordsByUserId(int userId);

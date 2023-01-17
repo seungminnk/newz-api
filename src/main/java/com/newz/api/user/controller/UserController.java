@@ -1,24 +1,24 @@
 package com.newz.api.user.controller;
 
+import com.newz.api.common.exception.ErrorCode;
 import com.newz.api.common.exception.ErrorResponse;
-import com.newz.api.news.keywordnews.model.NewsListResponse;
+import com.newz.api.common.exception.NewzCommonException;
 import com.newz.api.user.model.BookmarkAddRequest;
 import com.newz.api.user.model.BookmarkNewsListResponse;
+import com.newz.api.user.model.LoginRequest;
 import com.newz.api.user.model.UserInformationResponse;
 import com.newz.api.user.model.UserKeywordRemoveRequest;
 import com.newz.api.user.model.UserKeywordSetRequest;
 import com.newz.api.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import java.util.List;
-import java.util.Map;
 import javax.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -36,6 +36,24 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserController {
 
   private UserService userService;
+
+  @PostMapping("")
+  public ResponseEntity<UserInformationResponse> login(@RequestBody LoginRequest request) {
+    if(request.getServiceType() == null) {
+      throw new NewzCommonException(
+          HttpStatus.BAD_REQUEST,
+          ErrorCode.INVALID_REQUEST_PARAMETER.getCode(),
+          "소셜 서비스 타입을 다시 확인하세요.");
+    }
+    if(StringUtils.isBlank(request.getServiceUniqueId())) {
+      throw new NewzCommonException(
+          HttpStatus.BAD_REQUEST,
+          ErrorCode.INVALID_REQUEST_PARAMETER.getCode(),
+          "소셜 서비스 고유 id 값을 다시 확인하세요.");
+    }
+
+    return new ResponseEntity<>(userService.login(request), HttpStatus.OK);
+  }
 
   @Operation(summary = "사용자 정보 가져오기")
   @ApiResponses(value = {
@@ -107,8 +125,21 @@ public class UserController {
       )
   })
   @PostMapping("/keyword")
-  public ResponseEntity setUserKeyword(@RequestBody @Valid UserKeywordSetRequest request)
+  public ResponseEntity setUserKeyword(@RequestBody UserKeywordSetRequest request)
       throws Exception {
+    if(request.getUserId() == 0) {
+      throw new NewzCommonException(
+          HttpStatus.BAD_REQUEST,
+          ErrorCode.INVALID_REQUEST_PARAMETER.getCode(),
+          "'userId' 파라미터는 필수입니다.");
+    }
+    if(request.getKeywords().isEmpty()) {
+      throw new NewzCommonException(
+          HttpStatus.BAD_REQUEST,
+          ErrorCode.INVALID_REQUEST_PARAMETER.getCode(),
+          "등록할 키워드는 하나 이상이어야 합니다.");
+    }
+
     userService.setUserKeyword(request);
     return new ResponseEntity<>(HttpStatus.OK);
   }
@@ -127,7 +158,20 @@ public class UserController {
       )
   })
   @DeleteMapping("/keyword")
-  public ResponseEntity removeUserKeyword(@RequestBody @Valid UserKeywordRemoveRequest request) {
+  public ResponseEntity removeUserKeyword(@RequestBody UserKeywordRemoveRequest request) {
+    if(request.getUserId() == 0) {
+      throw new NewzCommonException(
+          HttpStatus.BAD_REQUEST,
+          ErrorCode.INVALID_REQUEST_PARAMETER.getCode(),
+          "'userId' 파라미터는 필수입니다.");
+    }
+    if(request.getKeywords().isEmpty()) {
+      throw new NewzCommonException(
+          HttpStatus.BAD_REQUEST,
+          ErrorCode.INVALID_REQUEST_PARAMETER.getCode(),
+          "삭제할 키워드는 하나 이상이어야 합니다.");
+    }
+
     userService.removeUserKeyword(request);
     return new ResponseEntity<>(HttpStatus.OK);
   }
@@ -168,6 +212,19 @@ public class UserController {
   })
   @PostMapping("/bookmark/add")
   public ResponseEntity<Void> addBookmark(@RequestBody @Valid BookmarkAddRequest request) {
+    if(request.getUserId() == 0) {
+      throw new NewzCommonException(
+          HttpStatus.BAD_REQUEST,
+          ErrorCode.INVALID_REQUEST_PARAMETER.getCode(),
+          "'userId' 파라미터는 필수입니다.");
+    }
+    if(StringUtils.isBlank(request.getNewsUrl())) {
+      throw new NewzCommonException(
+          HttpStatus.BAD_REQUEST,
+          ErrorCode.INVALID_REQUEST_PARAMETER.getCode(),
+          "북마크할 뉴스 링크는 필수 값입니다.");
+    }
+
     userService.addUserBookmark(request);
     return new ResponseEntity<>(HttpStatus.CREATED);
   }
