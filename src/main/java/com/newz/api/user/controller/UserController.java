@@ -124,8 +124,8 @@ public class UserController {
           }
       )
   })
-  @PostMapping("/keyword")
-  public ResponseEntity setUserKeyword(@RequestBody UserKeywordSetRequest request)
+  @PostMapping("/keyword/add")
+  public ResponseEntity addUserKeyword(@RequestBody UserKeywordSetRequest request)
       throws Exception {
     if(request.getUserId() == 0) {
       throw new NewzCommonException(
@@ -140,7 +140,7 @@ public class UserController {
           "등록할 키워드는 하나 이상이어야 합니다.");
     }
 
-    userService.setUserKeyword(request);
+    userService.addUserKeyword(request);
     return new ResponseEntity<>(HttpStatus.OK);
   }
 
@@ -157,7 +157,7 @@ public class UserController {
           }
       )
   })
-  @DeleteMapping("/keyword")
+  @PostMapping("/keyword/remove")
   public ResponseEntity removeUserKeyword(@RequestBody UserKeywordRemoveRequest request) {
     if(request.getUserId() == 0) {
       throw new NewzCommonException(
@@ -242,7 +242,7 @@ public class UserController {
           }
       )
   })
-  @PatchMapping("/bookmark/remove")
+  @PostMapping("/bookmark/remove")
   public ResponseEntity<Void> removeBookmark(@RequestParam("bookmarkId") int bookmarkId) {
     userService.removeUserBookmark(bookmarkId);
     return new ResponseEntity<>(HttpStatus.OK);

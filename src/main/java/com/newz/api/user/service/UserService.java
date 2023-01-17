@@ -96,7 +96,7 @@ public class UserService {
     return userRepository.getUserKeywordsByUserId(userId);
   }
 
-  public void setUserKeyword(UserKeywordSetRequest request) throws Exception {
+  public void addUserKeyword(UserKeywordSetRequest request) {
     int savedKeywordTotalCount = userRepository.getSavedKeywordTotalCountByUserId(request.getUserId());
     if(savedKeywordTotalCount == 9 || savedKeywordTotalCount + request.getKeywords().size() > 9) {
       throw new NewzCommonException(
