@@ -1,8 +1,11 @@
 package com.newz.api.common;
 
 import com.newz.api.common.auth.AuthenticationInterceptor;
+import com.newz.api.common.auth.NewzUserArgumentResolver;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -25,6 +28,11 @@ public class WebConfig implements WebMvcConfigurer {
         .excludePathPatterns("/api/user/login")
         .excludePathPatterns("/api/user/token/reissue")
         .excludePathPatterns("/api/keyword/fixed/list");
+  }
+
+  @Override
+  public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
+    resolvers.add(new NewzUserArgumentResolver());
   }
 
 }

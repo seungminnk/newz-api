@@ -3,6 +3,7 @@ package com.newz.api.user.service;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.newz.api.common.auth.JwtUtil;
+import com.newz.api.common.auth.NewzUser;
 import com.newz.api.common.exception.ErrorCode;
 import com.newz.api.common.exception.NewzCommonException;
 import com.newz.api.user.model.BookmarkAddRequest;
@@ -43,8 +44,12 @@ public class UserService {
 
   private static final String NEWS_API_URL = "http://localhost:5000/news/data";
 
+  public boolean isValidUser(int userId) {
+    return userRepository.getUserInformationByUserId(userId) != null;
+  }
+
   @Transactional
-  public UserInformationResponse login(LoginRequest request) {
+  public UserInformationResponse login(LoginRequest request) throws Exception {
     // TODO: 소셜로그인 유효성 체크
 
     UserVo user = userRepository.getUserInformationByServiceUniqueId(
@@ -53,7 +58,11 @@ public class UserService {
     if(user != null) {
       int keywordTotalCount = userRepository.getUserKeywordTotalCountByUserId(user.getId());
 
-      TokenResponse authTokens = this.generateAuthTokens(user.getId());
+      TokenResponse authTokens = this.generateAuthTokens(
+          NewzUser.builder()
+              .id(user.getId())
+              .build()
+      );
 
       userRepository.saveRefreshToken(user.getId(), authTokens.getRefreshToken());
 
@@ -75,7 +84,11 @@ public class UserService {
 
     userRepository.insertUser(newUser);
 
-    TokenResponse authTokens = this.generateAuthTokens(user.getId());
+    TokenResponse authTokens = this.generateAuthTokens(
+        NewzUser.builder()
+            .id(newUser.getId())
+            .build()
+    );
 
     userRepository.saveRefreshToken(newUser.getId(), authTokens.getRefreshToken());
 
@@ -88,9 +101,9 @@ public class UserService {
         .build();
   }
 
-  private TokenResponse generateAuthTokens(int userId) {
+  private TokenResponse generateAuthTokens(NewzUser user) throws Exception {
     return TokenResponse.builder()
-        .accessToken(JwtUtil.generateAccessToken(userId))
+        .accessToken(JwtUtil.generateAccessToken(user))
         .refreshToken(JwtUtil.generateRefreshToken())
         .build();
   }
@@ -104,7 +117,9 @@ public class UserService {
       throw new NewzCommonException(HttpStatus.NOT_FOUND, ErrorCode.USER_NOT_FOUND);
     }
 
-    TokenResponse authTokens = this.generateAuthTokens(user.getId());
+    TokenResponse authTokens = this.generateAuthTokens(NewzUser.builder()
+        .id(user.getId())
+        .build());
 
     userRepository.saveRefreshToken(user.getId(), authTokens.getRefreshToken());
 

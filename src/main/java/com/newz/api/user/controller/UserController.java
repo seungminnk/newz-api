@@ -1,5 +1,6 @@
 package com.newz.api.user.controller;
 
+import com.newz.api.common.auth.NewzUser;
 import com.newz.api.common.exception.ErrorCode;
 import com.newz.api.common.exception.ErrorResponse;
 import com.newz.api.common.exception.NewzCommonException;
@@ -37,7 +38,8 @@ public class UserController {
   private UserService userService;
 
   @PostMapping("/login")
-  public ResponseEntity<UserInformationResponse> login(@RequestBody LoginRequest request) {
+  public ResponseEntity<UserInformationResponse> login(@RequestBody LoginRequest request)
+      throws Exception {
     if(request.getServiceType() == null) {
       throw new NewzCommonException(
           HttpStatus.BAD_REQUEST,
@@ -91,8 +93,8 @@ public class UserController {
       )
   })
   @GetMapping("")
-  public ResponseEntity<UserInformationResponse> getUserInformation(@RequestParam("userId") int userId) {
-    return new ResponseEntity<>(userService.getUserInformationByUserId(userId), HttpStatus.OK);
+  public ResponseEntity<UserInformationResponse> getUserInformation(NewzUser user) {
+    return new ResponseEntity<>(userService.getUserInformationByUserId(user.getId()), HttpStatus.OK);
   }
 
   @Operation(summary = "사용자가 등록한 키워드 목록 가져오기")
@@ -109,8 +111,8 @@ public class UserController {
       )
   })
   @GetMapping("/keyword/list")
-  public ResponseEntity<List<String>> getUserKeywordList(@RequestParam("userId") int userId) {
-    return new ResponseEntity<>(userService.getUserKeywordsByUserId(userId), HttpStatus.OK);
+  public ResponseEntity<List<String>> getUserKeywordList(NewzUser user) {
+    return new ResponseEntity<>(userService.getUserKeywordsByUserId(user.getId()), HttpStatus.OK);
   }
 
   @Operation(summary = "사용자 키워드 등록하기")
@@ -137,20 +139,15 @@ public class UserController {
       )
   })
   @PostMapping("/keyword/add")
-  public ResponseEntity addUserKeyword(@RequestBody UserKeywordSetRequest request)
-      throws Exception {
-    if(request.getUserId() == 0) {
-      throw new NewzCommonException(
-          HttpStatus.BAD_REQUEST,
-          ErrorCode.INVALID_REQUEST_DATA.getCode(),
-          "'userId' 파라미터는 필수입니다.");
-    }
+  public ResponseEntity addUserKeyword(@RequestBody UserKeywordSetRequest request, NewzUser user) {
     if(request.getKeywords().isEmpty()) {
       throw new NewzCommonException(
           HttpStatus.BAD_REQUEST,
           ErrorCode.INVALID_REQUEST_DATA.getCode(),
           "등록할 키워드는 하나 이상이어야 합니다.");
     }
+
+    request.setUserId(user.getId());
 
     userService.addUserKeyword(request);
     return new ResponseEntity<>(HttpStatus.OK);
@@ -170,19 +167,15 @@ public class UserController {
       )
   })
   @PostMapping("/keyword/remove")
-  public ResponseEntity removeUserKeyword(@RequestBody UserKeywordRemoveRequest request) {
-    if(request.getUserId() == 0) {
-      throw new NewzCommonException(
-          HttpStatus.BAD_REQUEST,
-          ErrorCode.INVALID_REQUEST_DATA.getCode(),
-          "'userId' 파라미터는 필수입니다.");
-    }
+  public ResponseEntity removeUserKeyword(@RequestBody UserKeywordRemoveRequest request, NewzUser user) {
     if(request.getKeywords().isEmpty()) {
       throw new NewzCommonException(
           HttpStatus.BAD_REQUEST,
           ErrorCode.INVALID_REQUEST_DATA.getCode(),
           "삭제할 키워드는 하나 이상이어야 합니다.");
     }
+
+    request.setUserId(user.getId());
 
     userService.removeUserKeyword(request);
     return new ResponseEntity<>(HttpStatus.OK);
@@ -203,10 +196,11 @@ public class UserController {
   })
   @GetMapping("/bookmark/news")
   public ResponseEntity<BookmarkNewsListResponse> getUserBookmarkNews(
-      @RequestParam("userId") int userId,
       @RequestParam(value = "page", required = false, defaultValue = "1") int page,
-      @RequestParam(value = "limit", required = false, defaultValue = "3") int limit) {
-    return new ResponseEntity<>(userService.getUserBookmarkNewsByUserId(userId, page, limit), HttpStatus.OK);
+      @RequestParam(value = "limit", required = false, defaultValue = "3") int limit,
+      NewzUser user) {
+    return new ResponseEntity<>(
+        userService.getUserBookmarkNewsByUserId(user.getId(), page, limit), HttpStatus.OK);
   }
 
   @Operation(summary = "북마크 추가")
@@ -223,19 +217,15 @@ public class UserController {
       )
   })
   @PostMapping("/bookmark/add")
-  public ResponseEntity<Void> addBookmark(@RequestBody BookmarkAddRequest request) {
-    if(request.getUserId() == 0) {
-      throw new NewzCommonException(
-          HttpStatus.BAD_REQUEST,
-          ErrorCode.INVALID_REQUEST_DATA.getCode(),
-          "'userId' 파라미터는 필수입니다.");
-    }
+  public ResponseEntity<Void> addBookmark(@RequestBody BookmarkAddRequest request, NewzUser user) {
     if(StringUtils.isBlank(request.getNewsUrl())) {
       throw new NewzCommonException(
           HttpStatus.BAD_REQUEST,
           ErrorCode.INVALID_REQUEST_DATA.getCode(),
           "북마크할 뉴스 링크는 필수 값입니다.");
     }
+
+    request.setUserId(user.getId());
 
     userService.addUserBookmark(request);
     return new ResponseEntity<>(HttpStatus.CREATED);
