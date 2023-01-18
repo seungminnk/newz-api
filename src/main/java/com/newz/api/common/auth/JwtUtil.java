@@ -9,11 +9,11 @@ import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.security.SignatureException;
+import jakarta.annotation.PostConstruct;
 import java.security.Key;
 import java.util.Base64;
 import java.util.Calendar;
 import java.util.Date;
-import javax.annotation.PostConstruct;
 import javax.crypto.spec.SecretKeySpec;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -21,8 +21,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class JwtUtil {
 
-  private static final long ACCESS_TOKEN_VALID_TIME = 0;
-  private static final long REFRESH_TOKEN_VALID_TIME = 0;
+  private static final long ACCESS_TOKEN_VALID_TIME = 1209600000;  // 14일
+  private static final long REFRESH_TOKEN_VALID_TIME = 31536000000L;  // 1년
 
   private static final SignatureAlgorithm SIGNATURE_ALGORITHM = SignatureAlgorithm.HS256;
 
@@ -60,9 +60,9 @@ public class JwtUtil {
         .compact();
   }
 
-  public static void validateToken(String token) throws Exception {
+  public static Claims validateToken(String token) throws Exception {
     try {
-      Jwts.parserBuilder()
+      return Jwts.parserBuilder()
           .setSigningKey(signingKey)
           .build()
           .parseClaimsJws(token)
@@ -74,6 +74,11 @@ public class JwtUtil {
     } catch (Exception e) {
       throw new Exception(e);
     }
+  }
+
+  public static int parseUserIdByAccessToken(String accessToken) throws Exception {
+    Claims claims = validateToken(accessToken);
+    return claims.getSubject() != null ? Integer.parseInt(claims.getSubject()) : 0;
   }
 
 }

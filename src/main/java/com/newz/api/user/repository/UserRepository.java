@@ -17,6 +17,8 @@ public interface UserRepository {
 
   int insertUser(UserVo user);
 
+  UserVo getUserInformationByRefreshToken(String refreshToken);
+
   UserVo getUserInformationByUserId(int userId);
 
   List<String> getUserKeywordsByUserId(int userId);

@@ -18,6 +18,7 @@ public class UserVo {
   private String socialServiceUniqueId;
   private String name;
   private String email;
+  private String refreshToken;
 
   private boolean haveKeywords;
 

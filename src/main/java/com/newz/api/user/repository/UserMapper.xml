@@ -27,6 +27,12 @@
     VALUE (#{socialServiceType}, #{socialServiceUniqueId}, #{name}, #{email})
   </insert>
 
+  <select id="getUserInformationByRefreshToken" resultType="com.newz.api.user.vo.UserVo">
+    SELECT id, name, email
+    FROM user
+    WHERE refresh_token = #{refreshToken}
+  </select>
+
   <select id="getUserInformationByUserId" resultType="com.newz.api.user.vo.UserVo">
     SELECT u.id, u.name, u.email, IF(count(uk.keyword), true, false) AS haveKeywords
     FROM user u

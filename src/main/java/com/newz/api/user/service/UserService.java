@@ -9,6 +9,7 @@ import com.newz.api.user.model.BookmarkAddRequest;
 import com.newz.api.user.model.BookmarkNewsListModel;
 import com.newz.api.user.model.BookmarkNewsListResponse;
 import com.newz.api.user.model.LoginRequest;
+import com.newz.api.user.model.TokenResponse;
 import com.newz.api.user.model.UserInformationResponse;
 import com.newz.api.user.model.UserKeywordRemoveRequest;
 import com.newz.api.user.model.UserKeywordSetRequest;
@@ -52,18 +53,16 @@ public class UserService {
     if(user != null) {
       int keywordTotalCount = userRepository.getUserKeywordTotalCountByUserId(user.getId());
 
-      String accessToken = JwtUtil.generateAccessToken(user.getId());
-      String refreshToken = JwtUtil.generateRefreshToken();
+      TokenResponse authTokens = this.generateAuthTokens(user.getId());
 
-      userRepository.saveRefreshToken(user.getId(), refreshToken);
+      userRepository.saveRefreshToken(user.getId(), authTokens.getRefreshToken());
 
       return UserInformationResponse.builder()
           .id(user.getId())
           .name(user.getName())
           .email(user.getEmail())
           .haveKeywords(keywordTotalCount > 0)
-          .accessToken(accessToken)
-          .refreshToken(refreshToken)
+          .tokens(authTokens)
           .build();
     }
 
@@ -76,19 +75,40 @@ public class UserService {
 
     userRepository.insertUser(newUser);
 
-    String accessToken = JwtUtil.generateAccessToken(newUser.getId());
-    String refreshToken = JwtUtil.generateRefreshToken();
+    TokenResponse authTokens = this.generateAuthTokens(user.getId());
 
-    userRepository.saveRefreshToken(newUser.getId(), refreshToken);
+    userRepository.saveRefreshToken(newUser.getId(), authTokens.getRefreshToken());
 
     return UserInformationResponse.builder()
         .id(newUser.getId())
         .name(newUser.getName())
         .email(newUser.getEmail())
         .haveKeywords(false)
-        .accessToken(accessToken)
-        .refreshToken(refreshToken)
+        .tokens(authTokens)
         .build();
+  }
+
+  private TokenResponse generateAuthTokens(int userId) {
+    return TokenResponse.builder()
+        .accessToken(JwtUtil.generateAccessToken(userId))
+        .refreshToken(JwtUtil.generateRefreshToken())
+        .build();
+  }
+
+  @Transactional
+  public TokenResponse reissueTokensByRefreshToken(String refreshToken) throws Exception {
+    JwtUtil.validateToken(refreshToken);
+
+    UserVo user = userRepository.getUserInformationByRefreshToken(refreshToken);
+    if(user == null) {
+      throw new NewzCommonException(HttpStatus.NOT_FOUND, ErrorCode.USER_NOT_FOUND);
+    }
+
+    TokenResponse authTokens = this.generateAuthTokens(user.getId());
+
+    userRepository.saveRefreshToken(user.getId(), authTokens.getRefreshToken());
+
+    return authTokens;
   }
 
   public UserInformationResponse getUserInformationByUserId(int userId) {

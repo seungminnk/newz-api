@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/api")
+@RequestMapping("/api/keyword")
 public class KeywordController {
 
   private KeywordService keywordService;
@@ -36,7 +36,7 @@ public class KeywordController {
           }
       )
   })
-  @GetMapping("/fixed-keyword/list")
+  @GetMapping("/fixed/list")
   public ResponseEntity<List<String>> getFixedKeywordList() {
     return new ResponseEntity<>(keywordService.getFixedKeywords(), HttpStatus.OK);
   }

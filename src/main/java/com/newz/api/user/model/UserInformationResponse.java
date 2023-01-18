@@ -1,5 +1,7 @@
 package com.newz.api.user.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -12,7 +14,7 @@ public class UserInformationResponse {
   private String email;
   private boolean haveKeywords;
 
-  private String accessToken;
-  private String refreshToken;
+  @JsonInclude(Include.NON_EMPTY)
+  private TokenResponse tokens;
 
 }
