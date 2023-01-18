@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.AsyncHandlerInterceptor;
@@ -22,6 +23,10 @@ public class AuthenticationInterceptor implements AsyncHandlerInterceptor {
   @Override
   public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
       throws Exception {
+    if(isPreflightRequest(request)) {
+      return true;
+    }
+
     String accessToken = request.getHeader(ACCESS_TOKEN_HEADER);
     if(StringUtils.isBlank(accessToken)) {
       throw new NewzCommonException(HttpStatus.BAD_REQUEST, ErrorCode.TOKEN_NOT_FOUND);
@@ -40,6 +45,10 @@ public class AuthenticationInterceptor implements AsyncHandlerInterceptor {
     request.setAttribute("user", user);
 
     return true;
+  }
+
+  private boolean isPreflightRequest(HttpServletRequest request) {
+    return request.getMethod().equals(HttpMethod.OPTIONS.toString());
   }
 
 }
