@@ -13,8 +13,13 @@ import com.newz.api.user.model.UserKeywordRemoveRequest;
 import com.newz.api.user.model.UserKeywordSetRequest;
 import com.newz.api.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.media.Schema.AccessMode;
+import io.swagger.v3.oas.annotations.media.Schema.AdditionalPropertiesValue;
+import io.swagger.v3.oas.annotations.media.Schema.RequiredMode;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import java.util.List;
@@ -37,6 +42,48 @@ public class UserController {
 
   private UserService userService;
 
+  @Operation(summary = "로그인(회원가입)", description = "소셜로그인 후 로그인(또는 회원가입) 처리")
+  @ApiResponses(value = {
+      @ApiResponse(
+          responseCode = "200",
+          content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = UserInformationResponse.class)
+              )
+          }
+      ),
+      @ApiResponse(
+          responseCode = "400",
+          description = "필수 파라미터나 액세스 토큰이 누락된 경우 400(Bad Request) 반환",
+          content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = ErrorResponse.class)
+              )
+          }
+      ),
+      @ApiResponse(
+          responseCode = "401",
+          description = "헤더에 넣은 액세스 토큰이 만료되거나 유효하지 않은 경우 401(Unauthorize) 반환",
+          content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = ErrorResponse.class)
+              )
+          }
+      ),
+      @ApiResponse(
+          responseCode = "404",
+          description = "토큰에 있는 사용자 id에 해당하는 사용자가 존재하지 않는 경우 404(Not Found) 반환",
+          content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = ErrorResponse.class)
+              )
+          }
+      )
+  })
   @PostMapping("/login")
   public ResponseEntity<UserInformationResponse> login(@RequestBody LoginRequest request)
       throws Exception {
@@ -56,6 +103,51 @@ public class UserController {
     return new ResponseEntity<>(userService.login(request), HttpStatus.OK);
   }
 
+  @Operation(summary = "액세스 토큰 재발급", description = "리프레시 토큰으로 액세스 토큰 재발급")
+  @Parameters(value = {
+      @Parameter(name = "x-newz-refresh-token", description = "로그인 시 리턴받았던 리프레시 토큰")
+  })
+  @ApiResponses(value = {
+      @ApiResponse(
+          responseCode = "200",
+          content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = TokenResponse.class)
+              )
+          }
+      ),
+      @ApiResponse(
+          responseCode = "400",
+          description = "필수 파라미터나 액세스 토큰이 누락된 경우 400(Bad Request) 반환",
+          content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = ErrorResponse.class)
+              )
+          }
+      ),
+      @ApiResponse(
+          responseCode = "401",
+          description = "헤더에 넣은 액세스 토큰이 만료되거나 유효하지 않은 경우 401(Unauthorize) 반환",
+          content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = ErrorResponse.class)
+              )
+          }
+      ),
+      @ApiResponse(
+          responseCode = "404",
+          description = "토큰에 있는 사용자 id에 해당하는 사용자가 존재하지 않는 경우 404(Not Found) 반환",
+          content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = ErrorResponse.class)
+              )
+          }
+      )
+  })
   @PostMapping("/token/reissue")
   public ResponseEntity<TokenResponse> reissueTokensByRefreshToken(
       @RequestHeader("x-newz-refresh-token") String refreshToken) throws Exception {
@@ -69,11 +161,10 @@ public class UserController {
     return new ResponseEntity<>(userService.reissueTokensByRefreshToken(refreshToken), HttpStatus.OK);
   }
 
-  @Operation(summary = "사용자 정보 가져오기")
+  @Operation(summary = "사용자 정보 가져오기", description = "넘겨준 토큰 정보에 해당하는 사용자 정보 반환")
   @ApiResponses(value = {
       @ApiResponse(
           responseCode = "200",
-          description = "넘겨준 userId에 해당하는 사용자 정보 반환",
           content = {
               @Content(
                   mediaType = "application/json",
@@ -83,7 +174,27 @@ public class UserController {
       ),
       @ApiResponse(
           responseCode = "400",
-          description = "넘겨준 userId에 해당하는 사용자가 존재하지 않을 경우 400(Not Found) 반환",
+          description = "필수 파라미터나 액세스 토큰이 누락된 경우 400(Bad Request) 반환",
+          content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = ErrorResponse.class)
+              )
+          }
+      ),
+      @ApiResponse(
+          responseCode = "401",
+          description = "헤더에 넣은 액세스 토큰이 만료되거나 유효하지 않은 경우 401(Unauthorize) 반환",
+          content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = ErrorResponse.class)
+              )
+          }
+      ),
+      @ApiResponse(
+          responseCode = "404",
+          description = "토큰에 있는 사용자 id에 해당하는 사용자가 존재하지 않는 경우 404(Not Found) 반환",
           content = {
               @Content(
                   mediaType = "application/json",
@@ -93,7 +204,11 @@ public class UserController {
       )
   })
   @GetMapping("")
-  public ResponseEntity<UserInformationResponse> getUserInformation(NewzUser user) {
+  public ResponseEntity<UserInformationResponse> getUserInformation(
+      @Schema(
+          requiredMode = RequiredMode.NOT_REQUIRED,
+          accessMode = AccessMode.READ_ONLY,
+          description = "요청 시 무시해도 되는 파라미터 입니다.") NewzUser user) {
     return new ResponseEntity<>(userService.getUserInformationByUserId(user.getId()), HttpStatus.OK);
   }
 
@@ -101,17 +216,41 @@ public class UserController {
   @ApiResponses(value = {
       @ApiResponse(
           responseCode = "200",
-          description = "넘겨준 userId에 해당하는 사용자가 등록해 둔 키워드 목록 반환 (List<String>)",
+          description = "넘겨준 토큰에 해당하는 사용자가 등록해 둔 키워드 목록 반환 (List<String>)",
           content = {
               @Content(
                   mediaType = "application/json",
                   schema = @Schema(implementation = List.class)
               )
           }
+      ),
+      @ApiResponse(
+          responseCode = "401",
+          description = "헤더에 넣은 액세스 토큰이 만료되거나 유효하지 않은 경우 401(Unauthorize) 반환",
+          content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = ErrorResponse.class)
+              )
+          }
+      ),
+      @ApiResponse(
+          responseCode = "404",
+          description = "토큰에 있는 사용자 id에 해당하는 사용자가 존재하지 않는 경우 404(Not Found) 반환",
+          content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = ErrorResponse.class)
+              )
+          }
       )
   })
   @GetMapping("/keyword/list")
-  public ResponseEntity<List<String>> getUserKeywordList(NewzUser user) {
+  public ResponseEntity<List<String>> getUserKeywordList(
+      @Schema(
+          requiredMode = RequiredMode.NOT_REQUIRED,
+          accessMode = AccessMode.READ_ONLY,
+          description = "요청 시 무시해도 되는 파라미터 입니다.") NewzUser user) {
     return new ResponseEntity<>(userService.getUserKeywordsByUserId(user.getId()), HttpStatus.OK);
   }
 
@@ -128,6 +267,36 @@ public class UserController {
           }
       ),
       @ApiResponse(
+          responseCode = "400",
+          description = "필수 파라미터나 액세스 토큰이 누락된 경우 400(Bad Request) 반환",
+          content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = ErrorResponse.class)
+              )
+          }
+      ),
+      @ApiResponse(
+          responseCode = "401",
+          description = "헤더에 넣은 액세스 토큰이 만료되거나 유효하지 않은 경우 401(Unauthorize) 반환",
+          content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = ErrorResponse.class)
+              )
+          }
+      ),
+      @ApiResponse(
+          responseCode = "404",
+          description = "토큰에 있는 사용자 id에 해당하는 사용자가 존재하지 않는 경우 404(Not Found) 반환",
+          content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = ErrorResponse.class)
+              )
+          }
+      ),
+      @ApiResponse(
           responseCode = "409",
           description = "등록하려는 키워드 개수와 등록된 키워드 개수를 합해 9개를 초과한 경우 409(Conflict) 반환",
           content = {
@@ -139,7 +308,11 @@ public class UserController {
       )
   })
   @PostMapping("/keyword/add")
-  public ResponseEntity addUserKeyword(@RequestBody UserKeywordSetRequest request, NewzUser user) {
+  public ResponseEntity addUserKeyword(@RequestBody UserKeywordSetRequest request,
+      @Schema(
+          requiredMode = RequiredMode.NOT_REQUIRED,
+          accessMode = AccessMode.READ_ONLY,
+          description = "요청 시 무시해도 되는 파라미터 입니다.") NewzUser user) {
     if(request.getKeywords().isEmpty()) {
       throw new NewzCommonException(
           HttpStatus.BAD_REQUEST,
@@ -164,10 +337,44 @@ public class UserController {
                   schema = @Schema()
               )
           }
+      ),
+      @ApiResponse(
+          responseCode = "400",
+          description = "필수 파라미터나 액세스 토큰이 누락된 경우 400(Bad Request) 반환",
+          content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = ErrorResponse.class)
+              )
+          }
+      ),
+      @ApiResponse(
+          responseCode = "401",
+          description = "헤더에 넣은 액세스 토큰이 만료되거나 유효하지 않은 경우 401(Unauthorize) 반환",
+          content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = ErrorResponse.class)
+              )
+          }
+      ),
+      @ApiResponse(
+          responseCode = "404",
+          description = "토큰에 있는 사용자 id에 해당하는 사용자가 존재하지 않는 경우 404(Not Found) 반환",
+          content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = ErrorResponse.class)
+              )
+          }
       )
   })
   @PostMapping("/keyword/remove")
-  public ResponseEntity removeUserKeyword(@RequestBody UserKeywordRemoveRequest request, NewzUser user) {
+  public ResponseEntity removeUserKeyword(@RequestBody UserKeywordRemoveRequest request,
+      @Schema(
+          requiredMode = RequiredMode.NOT_REQUIRED,
+          accessMode = AccessMode.READ_ONLY,
+          description = "요청 시 무시해도 되는 파라미터 입니다.") NewzUser user) {
     if(request.getKeywords().isEmpty()) {
       throw new NewzCommonException(
           HttpStatus.BAD_REQUEST,
@@ -185,11 +392,41 @@ public class UserController {
   @ApiResponses(value = {
       @ApiResponse(
           responseCode = "200",
-          description = "넘겨준 userId에 해당하는 사용자가 북마크해둔 뉴스 기사 목록 반환",
+          description = "넘겨준 토큰에 해당하는 사용자가 북마크해둔 뉴스 기사 목록 반환",
           content = {
               @Content(
                   mediaType = "application/json",
                   schema = @Schema(implementation = BookmarkNewsListResponse.class)
+              )
+          }
+      ),
+      @ApiResponse(
+          responseCode = "400",
+          description = "필수 파라미터나 액세스 토큰이 누락된 경우 400(Bad Request) 반환",
+          content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = ErrorResponse.class)
+              )
+          }
+      ),
+      @ApiResponse(
+          responseCode = "401",
+          description = "헤더에 넣은 액세스 토큰이 만료되거나 유효하지 않은 경우 401(Unauthorize) 반환",
+          content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = ErrorResponse.class)
+              )
+          }
+      ),
+      @ApiResponse(
+          responseCode = "404",
+          description = "토큰에 있는 사용자 id에 해당하는 사용자가 존재하지 않는 경우 404(Not Found) 반환",
+          content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = ErrorResponse.class)
               )
           }
       )
@@ -198,7 +435,10 @@ public class UserController {
   public ResponseEntity<BookmarkNewsListResponse> getUserBookmarkNews(
       @RequestParam(value = "page", required = false, defaultValue = "1") int page,
       @RequestParam(value = "limit", required = false, defaultValue = "3") int limit,
-      NewzUser user) {
+      @Schema(
+          requiredMode = RequiredMode.NOT_REQUIRED,
+          accessMode = AccessMode.READ_ONLY,
+          description = "요청 시 무시해도 되는 파라미터 입니다.") NewzUser user) {
     return new ResponseEntity<>(
         userService.getUserBookmarkNewsByUserId(user.getId(), page, limit), HttpStatus.OK);
   }
@@ -214,10 +454,44 @@ public class UserController {
                   schema = @Schema()
               )
           }
+      ),
+      @ApiResponse(
+          responseCode = "400",
+          description = "필수 파라미터나 액세스 토큰이 누락된 경우 400(Bad Request) 반환",
+          content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = ErrorResponse.class)
+              )
+          }
+      ),
+      @ApiResponse(
+          responseCode = "401",
+          description = "헤더에 넣은 액세스 토큰이 만료되거나 유효하지 않은 경우 401(Unauthorize) 반환",
+          content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = ErrorResponse.class)
+              )
+          }
+      ),
+      @ApiResponse(
+          responseCode = "404",
+          description = "토큰에 있는 사용자 id에 해당하는 사용자가 존재하지 않는 경우 404(Not Found) 반환",
+          content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = ErrorResponse.class)
+              )
+          }
       )
   })
   @PostMapping("/bookmark/add")
-  public ResponseEntity<Void> addBookmark(@RequestBody BookmarkAddRequest request, NewzUser user) {
+  public ResponseEntity<Void> addBookmark(@RequestBody BookmarkAddRequest request,
+      @Schema(
+          requiredMode = RequiredMode.NOT_REQUIRED,
+          accessMode = AccessMode.READ_ONLY,
+          description = "요청 시 무시해도 되는 파라미터 입니다.") NewzUser user) {
     if(StringUtils.isBlank(request.getNewsUrl())) {
       throw new NewzCommonException(
           HttpStatus.BAD_REQUEST,
@@ -242,10 +516,41 @@ public class UserController {
                   schema = @Schema()
               )
           }
+      ),
+      @ApiResponse(
+          responseCode = "400",
+          description = "필수 파라미터나 액세스 토큰이 누락된 경우 400(Bad Request) 반환",
+          content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = ErrorResponse.class)
+              )
+          }
+      ),
+      @ApiResponse(
+          responseCode = "401",
+          description = "헤더에 넣은 액세스 토큰이 만료되거나 유효하지 않은 경우 401(Unauthorize) 반환",
+          content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = ErrorResponse.class)
+              )
+          }
+      ),
+      @ApiResponse(
+          responseCode = "404",
+          description = "토큰에 있는 사용자 id에 해당하는 사용자가 존재하지 않는 경우 404(Not Found) 반환",
+          content = {
+              @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = ErrorResponse.class)
+              )
+          }
       )
   })
   @PostMapping("/bookmark/remove")
-  public ResponseEntity<Void> removeBookmark(@RequestParam("bookmarkId") int bookmarkId) {
+  public ResponseEntity<Void> removeBookmark(@Schema(description = "삭제할 북마크 id", example = "1")
+    @RequestParam("bookmarkId") int bookmarkId) {
     userService.removeUserBookmark(bookmarkId);
     return new ResponseEntity<>(HttpStatus.OK);
   }

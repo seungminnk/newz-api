@@ -37,7 +37,7 @@ public class KeywordNewsController {
   })
   @GetMapping("/list")
   public ResponseEntity<NewsListResponse> getNewsListByQuery(
-      @RequestParam("query") String query,
+      @RequestParam("query") @Schema(description = "검색어", example = "플러터") String query,
       @RequestParam(value = "page", required = false, defaultValue = "1") int page,
       @RequestParam(value = "limit", required = false, defaultValue = "3") int limit) {
     return new ResponseEntity<>(keywordNewsService.getNewsListByQuery(query, page, limit), HttpStatus.OK);
