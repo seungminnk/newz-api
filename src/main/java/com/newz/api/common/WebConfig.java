@@ -27,7 +27,10 @@ public class WebConfig implements WebMvcConfigurer {
     interceptorRegistry.addInterceptor(authenticationInterceptor)
         .excludePathPatterns("/api/user/login")
         .excludePathPatterns("/api/user/token/reissue")
-        .excludePathPatterns("/api/keyword/fixed/list");
+        .excludePathPatterns("/api/keyword/fixed/list")
+        .excludePathPatterns("/swagger-ui/**")
+        .excludePathPatterns("/swagger-resources/**")
+        .excludePathPatterns("/v3/api-docs/**");
   }
 
   @Override
