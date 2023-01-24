@@ -91,13 +91,25 @@ public class UserController {
       throw new NewzCommonException(
           HttpStatus.BAD_REQUEST,
           ErrorCode.INVALID_REQUEST_DATA.getCode(),
-          "소셜 서비스 타입을 다시 확인하세요.");
+          "소셜 서비스 타입(serviceType) 파라미터를 다시 확인하세요.");
     }
     if(StringUtils.isBlank(request.getServiceUniqueId())) {
       throw new NewzCommonException(
           HttpStatus.BAD_REQUEST,
           ErrorCode.INVALID_REQUEST_DATA.getCode(),
-          "소셜 서비스 고유 id 값을 다시 확인하세요.");
+          "소셜 서비스 고유 id(serviceUniqueId) 파라미터를 다시 확인하세요.");
+    }
+    if(StringUtils.isBlank(request.getName())) {
+      throw new NewzCommonException(
+          HttpStatus.BAD_REQUEST,
+          ErrorCode.INVALID_REQUEST_DATA.getCode(),
+          "이름(name) 파라미터를 다시 확인하세요.");
+    }
+    if(StringUtils.isBlank(request.getEmail())) {
+      throw new NewzCommonException(
+          HttpStatus.BAD_REQUEST,
+          ErrorCode.INVALID_REQUEST_DATA.getCode(),
+          "이메일(email) 파라미터를 다시 확인하세요.");
     }
 
     return new ResponseEntity<>(userService.login(request), HttpStatus.OK);

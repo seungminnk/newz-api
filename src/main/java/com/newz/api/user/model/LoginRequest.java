@@ -12,5 +12,9 @@ public class LoginRequest {
   private SocialServiceType serviceType;
   @Schema(description = "소셜로그인 고유 id")
   private String serviceUniqueId;
+  @Schema(description = "이름", example = "홍길동")
+  private String name;
+  @Schema(description = "이메일", example = "gil-dong@test.com")
+  private String email;
 
 }
