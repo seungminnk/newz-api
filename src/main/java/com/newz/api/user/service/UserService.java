@@ -78,8 +78,8 @@ public class UserService {
     UserVo newUser = UserVo.builder()
         .socialServiceType(request.getServiceType().getServiceType())
         .socialServiceUniqueId(request.getServiceUniqueId())
-        .name("뉴모아")
-        .email("newmoa.newz@gmail.com")
+        .name(request.getName())
+        .email(request.getEmail())
         .build();
 
     userRepository.insertUser(newUser);
