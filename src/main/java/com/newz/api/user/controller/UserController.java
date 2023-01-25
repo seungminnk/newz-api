@@ -6,6 +6,7 @@ import com.newz.api.common.exception.ErrorResponse;
 import com.newz.api.common.exception.NewzCommonException;
 import com.newz.api.user.model.BookmarkAddRequest;
 import com.newz.api.user.model.BookmarkNewsListResponse;
+import com.newz.api.user.model.BookmarkRemoveRequest;
 import com.newz.api.user.model.LoginRequest;
 import com.newz.api.user.model.TokenResponse;
 import com.newz.api.user.model.UserInformationResponse;
@@ -18,7 +19,6 @@ import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.media.Schema.AccessMode;
-import io.swagger.v3.oas.annotations.media.Schema.AdditionalPropertiesValue;
 import io.swagger.v3.oas.annotations.media.Schema.RequiredMode;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -508,7 +508,7 @@ public class UserController {
       throw new NewzCommonException(
           HttpStatus.BAD_REQUEST,
           ErrorCode.INVALID_REQUEST_DATA.getCode(),
-          "북마크할 뉴스 링크는 필수 값입니다.");
+          "북마크할 뉴스 링크(newsUrl)는 필수 값입니다.");
     }
 
     request.setUserId(user.getId());
@@ -561,9 +561,21 @@ public class UserController {
       )
   })
   @PostMapping("/bookmark/remove")
-  public ResponseEntity<Void> removeBookmark(@Schema(description = "삭제할 북마크 id", example = "1")
-    @RequestParam("bookmarkId") int bookmarkId) {
-    userService.removeUserBookmark(bookmarkId);
+  public ResponseEntity<Void> removeBookmark(@RequestBody BookmarkRemoveRequest request,
+      @Schema(
+          requiredMode = RequiredMode.NOT_REQUIRED,
+          accessMode = AccessMode.READ_ONLY,
+          description = "요청 시 무시해도 되는 파라미터 입니다.") NewzUser user) {
+    if(StringUtils.isBlank(request.getNewsUrl())) {
+      throw new NewzCommonException(
+          HttpStatus.BAD_REQUEST,
+          ErrorCode.INVALID_REQUEST_DATA.getCode(),
+          "북마크 삭제할 뉴스 링크(newsUrl)는 필수입니다.");
+    }
+
+    request.setUserId(user.getId());
+
+    userService.removeUserBookmark(request);
     return new ResponseEntity<>(HttpStatus.OK);
   }
 

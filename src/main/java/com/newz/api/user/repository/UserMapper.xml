@@ -87,8 +87,9 @@
     VALUE (#{userId}, #{newsUrl})
   </insert>
 
-  <delete id="deleteUserBookmarkByBookmarkId" parameterType="int">
+  <delete id="deleteUserBookmarkByBookmarkId" parameterType="com.newz.api.user.vo.UserBookmarkVo">
     DELETE FROM user_bookmark
-    WHERE id = #{bookmarkId}
+    WHERE user_id = #{userId}
+      AND news_url = #{newsUrl}
   </delete>
 </mapper>

@@ -9,6 +9,7 @@ import com.newz.api.common.exception.NewzCommonException;
 import com.newz.api.user.model.BookmarkAddRequest;
 import com.newz.api.user.model.BookmarkNewsListModel;
 import com.newz.api.user.model.BookmarkNewsListResponse;
+import com.newz.api.user.model.BookmarkRemoveRequest;
 import com.newz.api.user.model.LoginRequest;
 import com.newz.api.user.model.TokenResponse;
 import com.newz.api.user.model.UserInformationResponse;
@@ -243,8 +244,13 @@ public class UserService {
     userRepository.insertUserBookmark(bookmark);
   }
 
-  public void removeUserBookmark(int bookmarkId) {
-    userRepository.deleteUserBookmarkByBookmarkId(bookmarkId);
+  public void removeUserBookmark(BookmarkRemoveRequest request) {
+    UserBookmarkVo bookmark = UserBookmarkVo.builder()
+        .userId(request.getUserId())
+        .newsUrl(request.getNewsUrl())
+        .build();
+
+    userRepository.deleteUserBookmarkByBookmarkId(bookmark);
   }
 
 }

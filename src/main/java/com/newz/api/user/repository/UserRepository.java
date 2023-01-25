@@ -35,6 +35,6 @@ public interface UserRepository {
 
   int insertUserBookmark(UserBookmarkVo bookmark);
 
-  int deleteUserBookmarkByBookmarkId(int bookmarkId);
+  int deleteUserBookmarkByBookmarkId(UserBookmarkVo bookmark);
 
 }
