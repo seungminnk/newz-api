@@ -1,0 +1,17 @@
+server:
+  port: 3001
+
+mybatis:
+  mapper-locations: classpath*:com/newz/**/**/**/*Mapper.xml
+  configuration:
+    map-underscore-to-camel-case: true
+
+spring:
+  profiles:
+    include: secret
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/newz?useUnicode=true&serverTimezone=Asia/Seoul&characterEncoding=utf8
+    username: newz
+    password: newz123

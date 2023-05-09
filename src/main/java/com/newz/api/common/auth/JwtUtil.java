@@ -27,11 +27,16 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 @Service
 public class JwtUtil {
+
+  @Autowired
+  private Environment env;
 
   private static final long ACCESS_TOKEN_VALID_TIME = 1209600000;  // 14일
   private static final long REFRESH_TOKEN_VALID_TIME = 31536000000L;  // 1년
@@ -46,17 +51,32 @@ public class JwtUtil {
 
   @PostConstruct
   void initialize() {
-    String secretKey = System.getenv("SECRET_KEY");
-    byte[] secretKeyBytes = secretKey.getBytes(StandardCharsets.UTF_8);
-    signingKey = new SecretKeySpec(secretKeyBytes, SIGNATURE_ALGORITHM.getJcaName());
+    try{
+      String secretKey = System.getenv("SECRET_KEY");
+      byte[] secretKeyBytes = secretKey.getBytes(StandardCharsets.UTF_8);
+      signingKey = new SecretKeySpec(secretKeyBytes, SIGNATURE_ALGORITHM.getJcaName());
 
-    String saltKey = System.getenv("SALT_KEY");
-    byte[] saltKeyBytes = saltKey.getBytes(StandardCharsets.UTF_8);
-    encryptKey = new SecretKeySpec(saltKeyBytes, "AES");
+      String saltKey = System.getenv("SALT_KEY");
+      byte[] saltKeyBytes = saltKey.getBytes(StandardCharsets.UTF_8);
+      encryptKey = new SecretKeySpec(saltKeyBytes, "AES");
 
-    String ivKey = System.getenv("IV_KEY");
-    byte[] ivKeyBytes = ivKey.getBytes(StandardCharsets.UTF_8);
-    iv = new IvParameterSpec(ivKeyBytes);
+      String ivKey = System.getenv("IV_KEY");
+      byte[] ivKeyBytes = ivKey.getBytes(StandardCharsets.UTF_8);
+      iv = new IvParameterSpec(ivKeyBytes);
+    }
+    catch (Exception e) {
+      String secretKey = env.getProperty("SECRET_KEY");
+      byte[] secretKeyBytes = secretKey.getBytes(StandardCharsets.UTF_8);
+      signingKey = new SecretKeySpec(secretKeyBytes, SIGNATURE_ALGORITHM.getJcaName());
+
+      String saltKey = env.getProperty("SALT_KEY");
+      byte[] saltKeyBytes = saltKey.getBytes(StandardCharsets.UTF_8);
+      encryptKey = new SecretKeySpec(saltKeyBytes, "AES");
+
+      String ivKey = env.getProperty("IV_KEY");
+      byte[] ivKeyBytes = ivKey.getBytes(StandardCharsets.UTF_8);
+      iv = new IvParameterSpec(ivKeyBytes);
+    }
   }
 
   private JwtUtil() {}
